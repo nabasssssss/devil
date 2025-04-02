@@ -13,8 +13,8 @@ printf '       ███████ ██    ██ ██    ██ ██ �
 printf '       ██   ██ ██    ██ ██    ██ ██  ██ ██ ██   ██ \n'
 printf '       ██   ██  ██████   ██████  ██   ████ ██████  \n\n'
 printf '\e[1;31m       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n'                                                                                
-printf " \e[1;93m      devil [TechChip]\e[0m \n"
-printf " \e[1;92m      aka naba \e[0m \n"
+printf " \e[1;93m      devil [hell]\e[0m \n"
+printf " \e[1;92m      aka dev \e[0m \n"
 printf "\e[1;90m devil is a simple and light tool for information gathering and capture GPS coordinates.\e[0m \n"
 printf "\n"
 }
