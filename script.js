@@ -1,145 +1,128 @@
-const msgerForm = get(".msger-inputarea");
-const msgerInput = get(".msger-input");
-const msgerChat = get(".msger-chat");
+const msgerForm = id("msgerForm");
+const msgerInput = id("msgerInput");
+const msgerChat = id("msgerChat");
 
-// Map places with image URLs, descriptions, and coordinates
-const PLACES_DATABASE = [
-  {
-    name: "Edinburgh Castle",
-    location: "Edinburgh, Scotland",
-    img: "https://images.unsplash.com/photo-1589802829985-817e51171b92?w=500",
-    description: "Historic fortress dominating the skyline of Edinburgh from Castle Rock.",
-    coords: [55.9486, -3.1999]
-  },
-  {
-    name: "Eiffel Tower",
-    location: "Paris, France",
-    img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=500",
-    description: "Iconic 19th-century wrought-iron lattice tower on the Champ de Mars.",
-    coords: [48.8584, 2.2945]
-  },
-  {
-    name: "Colosseum",
-    location: "Rome, Italy",
-    img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=500",
-    description: "Ancient amphitheatre built during the Roman Empire in the center of Rome.",
-    coords: [41.8902, 12.4922]
-  },
-  {
-    name: "Fushimi Inari Shrine",
-    location: "Kyoto, Japan",
-    img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500",
-    description: "Shinto shrine famous for thousands of vibrant orange torii gates.",
-    coords: [34.9671, 135.7727]
-  }
-];
+const BOT_IMG = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80";
+const PERSON_IMG = "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80";
+const BOT_NAME = "Assistant";
+const PERSON_NAME = "You";
 
-const BOT_IMG = "https://image.flaticon.com/icons/svg/854/854878.svg";
-const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
-const BOT_NAME = "Map Guide";
-const PERSON_NAME = "User";
-
-msgerForm.addEventListener("submit", event => {
+msgerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const msgText = msgerInput.value.trim();
   if (!msgText) return;
 
+  // Render User Message
   appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
   msgerInput.value = "";
-  
-  handleMapQuery(msgText);
+
+  // Render Loading Indicator
+  const loadingId = appendMessage(BOT_NAME, BOT_IMG, "left", "Searching for details...");
+
+  // Gather & Render Place Data
+  await fetchAndRenderPlace(msgText, loadingId);
 });
 
-// Standard text message renderer
+async function fetchAndRenderPlace(query, loadingMsgId) {
+  try {
+    // 1. Fetch place info from backend API route
+    const response = await fetch(`/api/place?q=${encodeURIComponent(query)}`);
+    const result = await response.json();
+
+    const loadingElement = id(loadingMsgId);
+
+    if (!response.ok || !result.success || !result.data) {
+      if (loadingElement) {
+        loadingElement.querySelector(".msg-text").innerText = "Sorry, I couldn't find any matching details for that location.";
+      }
+      return;
+    }
+
+    // 2. Normalize and extract place data cleanly
+    const place = formatPlaceData(result.data);
+
+    // 3. Render Place Card HTML inside the chat bubble
+    const cardHTML = renderPlaceCard(place);
+    if (loadingElement) {
+      loadingElement.querySelector(".msg-text").innerHTML = cardHTML;
+    }
+  } catch (error) {
+    console.error("Data gathering error:", error);
+    const loadingElement = id(loadingMsgId);
+    if (loadingElement) {
+      loadingElement.querySelector(".msg-text").innerText = "An error occurred while fetching information.";
+    }
+  }
+}
+
+/**
+ * Normalizes input data regardless of whether it's Google Places API or direct data.
+ */
+function formatPlaceData(data) {
+  const title = data.name || "Unknown Location";
+  const location = data.formatted_address || data.address || data.vicinity || "Address not available";
+  const description = data.editorial_summary?.overview || data.description || "No description provided for this place.";
+  
+  // Extract or build Image URL safely
+  let photoUrl = "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80"; // fallback
+  if (data.photo_url) {
+    photoUrl = data.photo_url;
+  } else if (data.photos && data.photos.length > 0) {
+    // If using Google Places photos directly:
+    photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photo_reference=${data.photos[0].photo_reference}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+  }
+
+  // Coordinates for Map Button
+  const lat = data.geometry?.location?.lat || data.lat;
+  const lng = data.geometry?.location?.lng || data.lng;
+  const mapUrl = (lat && lng) 
+    ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title + " " + location)}`;
+
+  return { title, location, description, photoUrl, mapUrl };
+}
+
+/**
+ * Generates the HTML layout matching CSS classes.
+ */
+function renderPlaceCard(place) {
+  return `
+    <div class="place-card">
+      <img class="place-photo" src="${place.photoUrl}" alt="${place.title}" onerror="this.src='https://via.placeholder.com/400x180?text=Photo+Unavailable';">
+      <div class="place-title">${escapeHTML(place.title)}</div>
+      <div class="place-location">📍 ${escapeHTML(place.location)}</div>
+      <p class="place-description">${escapeHTML(place.description)}</p>
+      <a class="map-btn" href="${place.mapUrl}" target="_blank" rel="noopener noreferrer">
+        🗺️ View on Google Maps
+      </a>
+    </div>
+  `;
+}
+
 function appendMessage(name, img, side, text) {
-  const safeText = escapeHTML(text);
-
+  const msgId = "msg-" + Date.now();
   const msgHTML = `
-    <div class="msg ${side}-msg">
+    <div class="msg ${side}-msg" id="${msgId}">
       <div class="msg-img" style="background-image: url(${img})"></div>
-
       <div class="msg-bubble">
         <div class="msg-info">
           <div class="msg-info-name">${name}</div>
           <div class="msg-info-time">${formatDate(new Date())}</div>
         </div>
-
-        <div class="msg-text">${safeText}</div>
+        <div class="msg-text">${text}</div>
       </div>
     </div>
   `;
 
   msgerChat.insertAdjacentHTML("beforeend", msgHTML);
-  msgerChat.scrollTop = msgerChat.scrollHeight;
+  msgerChat.scrollTop += 500;
+  return msgId;
 }
 
-// Special renderer for places with photos and map action buttons
-function appendPlaceCard(place) {
-  const cardHTML = `
-    <div class="msg left-msg">
-      <div class="msg-img" style="background-image: url(${BOT_IMG})"></div>
-
-      <div class="msg-bubble">
-        <div class="msg-info">
-          <div class="msg-info-name">${BOT_NAME}</div>
-          <div class="msg-info-time">${formatDate(new Date())}</div>
-        </div>
-
-        <div class="msg-text">
-          <div class="place-card">
-            <img src="${place.img}" alt="${escapeHTML(place.name)}" class="place-photo" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;" />
-            <strong>📍 ${escapeHTML(place.name)}</strong>
-            <p style="margin: 4px 0; font-size: 0.85em; color: #666;">${escapeHTML(place.location)}</p>
-            <p style="margin: 6px 0; font-size: 0.9em;">${escapeHTML(place.description)}</p>
-            <button onclick="panToCoordinates(${place.coords[0]}, ${place.coords[1]})" style="background:#007bff; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.85em; margin-top:4px;">
-              Center on Map
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  msgerChat.insertAdjacentHTML("beforeend", cardHTML);
-  msgerChat.scrollTop = msgerChat.scrollHeight;
-}
-
-function handleMapQuery(userInput) {
-  const query = userInput.toLowerCase();
-
-  // Search if the query matches any place in our database
-  const foundPlace = PLACES_DATABASE.find(p => 
-    query.includes(p.name.toLowerCase()) || 
-    query.includes(p.location.toLowerCase().split(",")[0])
-  );
-
-  if (foundPlace) {
-    setTimeout(() => {
-      appendPlaceCard(foundPlace);
-    }, 500);
-  } else {
-    // Show a random featured place card if no specific match is found
-    const randomPlace = PLACES_DATABASE[random(0, PLACES_DATABASE.length - 1)];
-    setTimeout(() => {
-      appendMessage(BOT_NAME, BOT_IMG, "left", `Here is a featured landmark you can check out on the map:`);
-      appendPlaceCard(randomPlace);
-    }, 600);
-  }
-}
-
-// Function called by the card button to sync with your map UI
-function panToCoordinates(lat, lng) {
-  if (window.map) {
-    window.map.flyTo([lat, lng], 15);
-  } else {
-    console.log(`Map target: ${lat}, ${lng}`);
-  }
-}
-
-// Utilities
-function get(selector, root = document) {
-  return root.querySelector(selector);
+// Helpers
+function id(elementId) {
+  return document.getElementById(elementId);
 }
 
 function formatDate(date) {
@@ -148,18 +131,8 @@ function formatDate(date) {
   return `${h.slice(-2)}:${m.slice(-2)}`;
 }
 
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function escapeHTML(str) {
   return str.replace(/[&<>'"]/g, 
-    tag => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      "'": '&#39;',
-      '"': '&quot;'
-    }[tag] || tag)
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );
 }
