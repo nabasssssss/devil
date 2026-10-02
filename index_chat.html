@@ -2,48 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Interactive Map & Landmark Explorer</title>
-  <link rel="stylesheet" href="./style.css">
-  <!-- FontAwesome icons for header/map UI elements -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Places Assistant</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<section class="msger">
-  <header class="msger-header">
-    <div class="msger-header-title">
-      <i class="fas fa-map-marked-alt"></i> Landmark & Map Explorer
-    </div>
-    <div class="msger-header-options">
-      <span><i class="fas fa-layer-group"></i></span>
-    </div>
-  </header>
 
-  <main class="msger-chat">
-    <div class="msg left-msg">
-      <div
-       class="msg-img"
-       style="background-image: url(https://image.flaticon.com/icons/svg/854/854878.svg)"
-      ></div>
+  <section class="msger">
+    <header class="msger-header">
+      <div class="msger-header-title">
+        📍 Place Finder Assistant
+      </div>
+      <div class="msger-header-options">
+        <span>● Online</span>
+      </div>
+    </header>
 
-      <div class="msg-bubble">
-        <div class="msg-info">
-          <div class="msg-info-name">Map Guide</div>
-          <div class="msg-info-time">Just now</div>
-        </div>
-
-        <div class="msg-text">
-          Welcome to Landmark Explorer! 🗺️ Ask me about world landmarks, cities, or places to explore photos, details, and coordinates on the map.
+    <main class="msger-chat" id="msgerChat">
+      <!-- Welcome Message -->
+      <div class="msg left-msg">
+        <div class="msg-img" style="background-image: url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80')"></div>
+        <div class="msg-bubble">
+          <div class="msg-info">
+            <div class="msg-info-name">Assistant</div>
+            <div class="msg-info-time">Just now</div>
+          </div>
+          <div class="msg-text">
+            Hi! Tell me what place or venue you are looking for (e.g., "Eiffel Tower" or "Coffee near me").
+          </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <form class="msger-inputarea">
-    <input type="text" class="msger-input" placeholder="Search a place or landmark (e.g., Edinburgh Castle, Eiffel Tower)...">
-    <button type="submit" class="msger-send-btn">Search</button>
-  </form>
-</section>
+    <form class="msger-inputarea" id="msgerForm">
+      <input type="text" class="msger-input" id="msgerInput" placeholder="Type a place name..." autocomplete="off">
+      <button type="submit" class="msger-send-btn">Send</button>
+    </form>
+  </section>
 
-<script src="./script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
