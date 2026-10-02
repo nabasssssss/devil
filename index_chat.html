@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Map & Route Finder</title>
+  <title>Interactive Map & Landmark Explorer</title>
   <link rel="stylesheet" href="./style.css">
+  <!-- FontAwesome icons for header/map UI elements -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body onload="gpsLocation()">
+<body>
 <section class="msger">
   <header class="msger-header">
     <div class="msger-header-title">
-      <i class="fas fa-map-marked-alt"></i> Interactive Map Explorer
+      <i class="fas fa-map-marked-alt"></i> Landmark & Map Explorer
     </div>
     <div class="msger-header-options">
       <span><i class="fas fa-layer-group"></i></span>
@@ -25,26 +27,23 @@
 
       <div class="msg-bubble">
         <div class="msg-info">
-          <div class="msg-info-name">Map System</div>
-          <div class="msg-info-time"></div>
+          <div class="msg-info-name">Map Guide</div>
+          <div class="msg-info-time">Just now</div>
         </div>
 
         <div class="msg-text">
-          Welcome to Map Explorer! Turn on your location services to view your current coordinates, locate nearby places, and calculate routes. 🗺️📍
+          Welcome to Landmark Explorer! 🗺️ Ask me about world landmarks, cities, or places to explore photos, details, and coordinates on the map.
         </div>
       </div>
     </div>
-
   </main>
 
   <form class="msger-inputarea">
-    <input type="text" class="msger-input" placeholder="Enter an address, city, or coordinates...">
-    <button type="submit" class="msger-send-btn">Find on Map</button>
+    <input type="text" class="msger-input" placeholder="Search a place or landmark (e.g., Edinburgh Castle, Eiffel Tower)...">
+    <button type="submit" class="msger-send-btn">Search</button>
   </form>
 </section>
-<script src="./script.js"></script>
-<p id="techchip"></p>
-<!-- tc_payload -->
 
+<script src="./script.js"></script>
 </body>
 </html>
