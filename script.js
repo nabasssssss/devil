@@ -2,16 +2,39 @@ const msgerForm = get(".msger-inputarea");
 const msgerInput = get(".msger-input");
 const msgerChat = get(".msger-chat");
 
-// Map-focused responses
-const BOT_MSGS = [
-  "Where would you like to explore today?",
-  "You can search for places, dropped pins, or routes using the search bar above.",
-  "Click any marker on the map to inspect location details.",
-  "Try asking for directions, or click 'Find Points of Interest' on the map!"
+// Map places with image URLs, descriptions, and coordinates
+const PLACES_DATABASE = [
+  {
+    name: "Edinburgh Castle",
+    location: "Edinburgh, Scotland",
+    img: "https://images.unsplash.com/photo-1589802829985-817e51171b92?w=500",
+    description: "Historic fortress dominating the skyline of Edinburgh from Castle Rock.",
+    coords: [55.9486, -3.1999]
+  },
+  {
+    name: "Eiffel Tower",
+    location: "Paris, France",
+    img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=500",
+    description: "Iconic 19th-century wrought-iron lattice tower on the Champ de Mars.",
+    coords: [48.8584, 2.2945]
+  },
+  {
+    name: "Colosseum",
+    location: "Rome, Italy",
+    img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=500",
+    description: "Ancient amphitheatre built during the Roman Empire in the center of Rome.",
+    coords: [41.8902, 12.4922]
+  },
+  {
+    name: "Fushimi Inari Shrine",
+    location: "Kyoto, Japan",
+    img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500",
+    description: "Shinto shrine famous for thousands of vibrant orange torii gates.",
+    coords: [34.9671, 135.7727]
+  }
 ];
 
-// Map-themed avatars
-const BOT_IMG = "https://image.flaticon.com/icons/svg/854/854878.svg"; // Map pin/navigation icon
+const BOT_IMG = "https://image.flaticon.com/icons/svg/854/854878.svg";
 const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
 const BOT_NAME = "Map Guide";
 const PERSON_NAME = "User";
@@ -25,10 +48,10 @@ msgerForm.addEventListener("submit", event => {
   appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
   msgerInput.value = "";
   
-  // Route user query to map logic or bot message
   handleMapQuery(msgText);
 });
 
+// Standard text message renderer
 function appendMessage(name, img, side, text) {
   const safeText = escapeHTML(text);
 
@@ -51,35 +74,70 @@ function appendMessage(name, img, side, text) {
   msgerChat.scrollTop = msgerChat.scrollHeight;
 }
 
+// Special renderer for places with photos and map action buttons
+function appendPlaceCard(place) {
+  const cardHTML = `
+    <div class="msg left-msg">
+      <div class="msg-img" style="background-image: url(${BOT_IMG})"></div>
+
+      <div class="msg-bubble">
+        <div class="msg-info">
+          <div class="msg-info-name">${BOT_NAME}</div>
+          <div class="msg-info-time">${formatDate(new Date())}</div>
+        </div>
+
+        <div class="msg-text">
+          <div class="place-card">
+            <img src="${place.img}" alt="${escapeHTML(place.name)}" class="place-photo" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:8px;" />
+            <strong>📍 ${escapeHTML(place.name)}</strong>
+            <p style="margin: 4px 0; font-size: 0.85em; color: #666;">${escapeHTML(place.location)}</p>
+            <p style="margin: 6px 0; font-size: 0.9em;">${escapeHTML(place.description)}</p>
+            <button onclick="panToCoordinates(${place.coords[0]}, ${place.coords[1]})" style="background:#007bff; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.85em; margin-top:4px;">
+              Center on Map
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  msgerChat.insertAdjacentHTML("beforeend", cardHTML);
+  msgerChat.scrollTop = msgerChat.scrollHeight;
+}
+
 function handleMapQuery(userInput) {
-  // Simple keyword routing for map feature interactions
-  const inputLower = userInput.toLowerCase();
-  
-  if (inputLower.includes("route") || inputLower.includes("directions")) {
+  const query = userInput.toLowerCase();
+
+  // Search if the query matches any place in our database
+  const foundPlace = PLACES_DATABASE.find(p => 
+    query.includes(p.name.toLowerCase()) || 
+    query.includes(p.location.toLowerCase().split(",")[0])
+  );
+
+  if (foundPlace) {
     setTimeout(() => {
-      appendMessage(BOT_NAME, BOT_IMG, "left", "To calculate a route, click a starting point and a destination point on the map.");
-    }, 600);
-  } else if (inputLower.includes("search") || inputLower.includes("find")) {
-    setTimeout(() => {
-      appendMessage(BOT_NAME, BOT_IMG, "left", "Searching map database... Try typing a city name, postal code, or landmark.");
-    }, 600);
+      appendPlaceCard(foundPlace);
+    }, 500);
   } else {
-    // Fallback random map tip
-    botResponse();
+    // Show a random featured place card if no specific match is found
+    const randomPlace = PLACES_DATABASE[random(0, PLACES_DATABASE.length - 1)];
+    setTimeout(() => {
+      appendMessage(BOT_NAME, BOT_IMG, "left", `Here is a featured landmark you can check out on the map:`);
+      appendPlaceCard(randomPlace);
+    }, 600);
   }
 }
 
-function botResponse() {
-  const r = random(0, BOT_MSGS.length - 1);
-  const msgText = BOT_MSGS[r];
-  const delay = msgText.split(" ").length * 80;
-
-  setTimeout(() => {
-    appendMessage(BOT_NAME, BOT_IMG, "left", msgText);
-  }, delay);
+// Function called by the card button to sync with your map UI
+function panToCoordinates(lat, lng) {
+  if (window.map) {
+    window.map.flyTo([lat, lng], 15);
+  } else {
+    console.log(`Map target: ${lat}, ${lng}`);
+  }
 }
 
-// Utility Functions
+// Utilities
 function get(selector, root = document) {
   return root.querySelector(selector);
 }
